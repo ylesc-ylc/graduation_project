@@ -2028,6 +2028,7 @@ void mainProgram(const nlohmann::json &student, const std::filesystem::path &wor
                 shellDisplay->run();
                 demandDisplay->changeFile(workDir/lab / demandFile);
                 demandDisplay->run();
+		git->reinitialize(workDir / lab);
                 top_panel(mainPanel);
                 update_panels();
                 doupdate();
@@ -2070,9 +2071,11 @@ void mainProgram(const nlohmann::json &student, const std::filesystem::path &wor
             doupdate();
             std::string commitMessage = git->run();
             //commitMessage.erase(std::remove(commitMessage.begin(), commitMessage.end(), ' '), commitMessage.end());
-            git->reinitialize(lab);
-            git_add_all(workDir);
-            use_git_commit(workDir, commitMessage);
+            if (!commitMessage.empty())
+            {
+                git_add_all(workDir);
+                use_git_commit(workDir, commitMessage);
+            }
             curs_set(0);
             top_panel(mainPanel);
             update_panels();
