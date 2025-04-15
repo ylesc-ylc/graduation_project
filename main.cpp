@@ -1201,20 +1201,38 @@ void record_with_asciinema(const std::string &editor,
     }
     else if (pid == 0)
     {
-        // Child process - execute asciinema
-        execlp("asciinema",
-               "asciinema",
-               "rec",
-               "-q",
-               "--stdin",
-               "--append",
-               "--command",
-               command.c_str(),
-               recording_file.c_str(),
-               nullptr);
+        if (file.tellg() == 0)
+        {
+            execlp("asciinema",
+                   "asciinema",
+                   "rec",
+                   "-q",
+                   "--stdin",
+                   "--command",
+                   command.c_str(),
+                   recording_file.c_str(),
+                   nullptr);
 
-        // If execlp returns, it failed
-        exit(EXIT_FAILURE);
+            // If execlp returns, it failed
+            exit(EXIT_FAILURE);
+        }
+        // Child process - execute asciinema
+        else
+        {
+            execlp("asciinema",
+                   "asciinema",
+                   "rec",
+                   "-q",
+                   "--stdin",
+                   "--append",
+                   "--command",
+                   command.c_str(),
+                   recording_file.c_str(),
+                   nullptr);
+
+            // If execlp returns, it failed
+            exit(EXIT_FAILURE);
+        }
     }
     else
     {
@@ -1229,6 +1247,8 @@ void record_with_asciinema(const std::string &editor,
             throw std::runtime_error("asciinema recording failed");
         }
     }
+
+    initscr();
 
     // Restore ncurses state
     reset_prog_mode();
